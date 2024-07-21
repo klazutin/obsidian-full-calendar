@@ -18,6 +18,7 @@ export function launchCreateModal(
                 id,
                 type: cal.type,
                 name: cal.name,
+                defaultEventColor: cal.color,
             };
         });
     new ReactModal(plugin.app, async (closeModal) =>
@@ -55,6 +56,7 @@ export function launchEditModal(plugin: FullCalendarPlugin, eventId: string) {
                 id,
                 type: cal.type,
                 name: cal.name,
+                defaultEventColor: cal.color,
             };
         });
 

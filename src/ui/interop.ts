@@ -109,6 +109,8 @@ export function toEventInput(
     let event: EventInput = {
         id,
         title: frontmatter.title,
+        backgroundColor: "#" + frontmatter.color,
+        borderColor: "#" + frontmatter.color,
         allDay: frontmatter.allDay,
     };
     if (frontmatter.type === "recurring") {

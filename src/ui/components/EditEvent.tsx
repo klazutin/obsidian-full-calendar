@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { CirclePicker } from "react-color";
 import { CalendarInfo, OFCEvent } from "../../types";
 
 function makeChangeListener<T>(
@@ -81,6 +82,7 @@ interface EditEventProps {
         id: string;
         name: string;
         type: CalendarInfo["type"];
+        defaultEventColor: string;
     }[];
     defaultCalendarIndex: number;
     initialEvent?: Partial<OFCEvent>;
@@ -153,6 +155,21 @@ export const EditEvent = ({
             initialEvent.completed !== null
     );
 
+    const defaultEventColorHex = window
+        .getComputedStyle(
+            Object.assign(
+                document.body.appendChild(document.createElement("div")),
+                {
+                    style: `background-color: ${calendars[calendarIndex].defaultEventColor};`,
+                }
+            )
+        )
+        .getPropertyValue("background-color");
+    const [color, setColor] = useState(
+        initialEvent?.color ? "#" + initialEvent.color : defaultEventColorHex
+    );
+    const [selectingColor, setSelectingColor] = useState(false);
+
     const titleRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
         if (titleRef.current) {
@@ -165,6 +182,7 @@ export const EditEvent = ({
         await submit(
             {
                 ...{ title },
+                ...{ color: '"' + color.replace("#", "") + '"' },
                 ...(allDay
                     ? { allDay: true }
                     : { allDay: false, startTime: startTime || "", endTime }),
@@ -348,7 +366,7 @@ export const EditEvent = ({
                 </p>
 
                 {isTask && (
-                    <>
+                    <p>
                         <label htmlFor="taskStatus">Complete? </label>
                         <input
                             id="taskStatus"
@@ -364,7 +382,56 @@ export const EditEvent = ({
                             }
                             type="checkbox"
                         />
-                    </>
+                    </p>
+                )}
+
+                <p style={{ marginTop: "-8px" }}>
+                    <label>Event color </label>
+                    <span
+                        style={{
+                            display: "inline-block",
+                            width: "24px",
+                            height: "24px",
+                            transform: "translateY(6px)",
+                            borderRadius: "99px",
+                            border: "1px solid gray",
+                            backgroundColor: color,
+                        }}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            console.log(color);
+                            setSelectingColor(true);
+                        }}
+                    ></span>
+                </p>
+
+                {selectingColor && (
+                    <CirclePicker
+                        onChangeComplete={(color) => {
+                            setColor(String(color.hex));
+                            setSelectingColor(false);
+                        }}
+                        colors={[
+                            defaultEventColorHex,
+                            "#e91e63",
+                            "#9c27b0",
+                            "#673ab7",
+                            "#3f51b5",
+                            "#2196f3",
+                            "#03a9f4",
+                            "#00bcd4",
+                            "#009688",
+                            "#4caf50",
+                            "#8bc34a",
+                            "#cddc39",
+                            "#ffeb3b",
+                            "#ffc107",
+                            "#ff9800",
+                            "#ff5722",
+                            "#795548",
+                            "#607d8b",
+                        ]}
+                    />
                 )}
 
                 <p
